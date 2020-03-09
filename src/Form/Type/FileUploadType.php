@@ -88,7 +88,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             $subDir = false === $pos ? '' : substr($name, 0, $pos);
             $name = false === $pos ? $name : substr($name, $pos + 1);
 
-            $file->move(rtrim($uploadDir, '/\\').\DIRECTORY_SEPARATOR.$subDir, $name);
+            $file->move(rtrim($uploadDir, '/\\') . \DIRECTORY_SEPARATOR . $subDir, $name);
         };
 
         $uploadDelete = static function (File $file) {
@@ -114,7 +114,20 @@ class FileUploadType extends AbstractType implements DataMapperInterface
         };
 
         $downloadPath = function (Options $options) {
-            return mb_substr($options['upload_dir'], mb_strlen($this->projectDir.'/public/'));
+            $composer = json_decode(file_get_contents(
+                $this->projectDir . \DIRECTORY_SEPARATOR . 'composer.json'
+            ), true);
+            $public_path = array_key_exists('public-dir', $composer['extra'])
+                ? $composer['extra']['public-dir']
+                : 'public';
+            return mb_substr(
+                $options['upload_dir'],
+                mb_strlen(
+                    $this->projectDir
+                        . \DIRECTORY_SEPARATOR
+                        . $public_path
+                )
+            );
         };
 
         $allowAdd = static function (Options $options) {
@@ -130,7 +143,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
         };
 
         $resolver->setDefaults([
-            'upload_dir' => $this->projectDir.'/public/uploads/files/',
+            'upload_dir' => $this->projectDir . '/public/uploads/files/',
             'upload_new' => $uploadNew,
             'upload_delete' => $uploadDelete,
             'upload_filename' => $uploadFilename,
@@ -161,7 +174,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             }
 
             if (0 !== mb_strpos($value, \DIRECTORY_SEPARATOR)) {
-                $value = $this->projectDir.'/'.$value;
+                $value = $this->projectDir . '/' . $value;
             }
 
             if ('' !== $value && (!is_dir($value) || !is_writable($value))) {
@@ -176,12 +189,16 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             }
 
             $generateUuid4 = static function () {
-                return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    random_int(0, 0xffff), random_int(0, 0xffff),
+                return sprintf(
+                    '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                    random_int(0, 0xffff),
+                    random_int(0, 0xffff),
                     random_int(0, 0xffff),
                     random_int(0, 0x0fff) | 0x4000,
                     random_int(0, 0x3fff) | 0x8000,
-                    random_int(0, 0xffff), random_int(0, 0xffff), random_int(0, 0xffff)
+                    random_int(0, 0xffff),
+                    random_int(0, 0xffff),
+                    random_int(0, 0xffff)
                 );
             };
 
