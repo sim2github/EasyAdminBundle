@@ -13,13 +13,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class StringToFileTransformer implements DataTransformerInterface
 {
     private $uploadDir;
+    private $downloadPath;
     private $uploadFilename;
     private $uploadValidate;
     private $multiple;
 
-    public function __construct(string $uploadDir, callable $uploadFilename, callable $uploadValidate, bool $multiple)
+    public function __construct(string $uploadDir, string $downloadPath, callable $uploadFilename, callable $uploadValidate, bool $multiple)
     {
         $this->uploadDir = $uploadDir;
+        $this->downloadPath = $downloadPath;
         $this->uploadFilename = $uploadFilename;
         $this->uploadValidate = $uploadValidate;
         $this->multiple = $multiple;
@@ -30,9 +32,11 @@ class StringToFileTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value || [] === $value) {
+        if (null === $value || [] === $value || '' === $value) {
             return null;
         }
+
+        $value = $this->uploadDir . $value;
 
         if (!$this->multiple) {
             return $this->doTransform($value);
@@ -87,19 +91,20 @@ class StringToFileTransformer implements DataTransformerInterface
         if (null === $value) {
             return null;
         }
-
         if ($value instanceof UploadedFile) {
             if (!$value->isValid()) {
                 throw new TransformationFailedException($value->getErrorMessage());
             }
 
-            $filename = $this->uploadDir.($this->uploadFilename)($value);
+            $validPath = ($this->uploadValidate)(
+                $this->uploadDir . ($this->uploadFilename)($value)
+            );
 
-            return ($this->uploadValidate)($filename);
+            return basename($validPath);
         }
 
         if ($value instanceof File) {
-            return $value->getPathname();
+            return $value->getFilename();
         }
 
         throw new TransformationFailedException('Expected an instance of File or null.');

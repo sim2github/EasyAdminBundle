@@ -83,7 +83,7 @@ trait AdminControllerTrait
             }
         }
 
-        return $this->executeDynamicMethod($action.'<EntityName>Action');
+        return $this->executeDynamicMethod($action . '<EntityName>Action');
     }
 
     /**
@@ -424,7 +424,7 @@ trait AdminControllerTrait
             $actionName = $batchForm->get('name')->getData();
             $actionIds = $batchForm->get('ids')->getData();
 
-            $batchActionResult = $this->executeDynamicMethod($actionName.'<EntityName>BatchAction', [$actionIds, $batchForm]);
+            $batchActionResult = $this->executeDynamicMethod($actionName . '<EntityName>BatchAction', [$actionIds, $batchForm]);
             if ($batchActionResult instanceof Response) {
                 return $batchActionResult;
             }
@@ -572,8 +572,7 @@ trait AdminControllerTrait
             $uploadNew = $config->getOption('upload_new');
 
             foreach ($state->getUploadedFiles() as $index => $file) {
-                $fileName = mb_substr($filePaths[$index], mb_strlen($uploadDir));
-                $uploadNew($file, $uploadDir, $fileName);
+                $uploadNew($file, $uploadDir, $filePaths[$index]);
             }
         }
     }
@@ -824,7 +823,7 @@ trait AdminControllerTrait
      */
     protected function createEntityForm($entity, array $entityProperties, $view)
     {
-        if (method_exists($this, $customMethodName = 'create'.$this->entity['name'].'EntityForm')) {
+        if (method_exists($this, $customMethodName = 'create' . $this->entity['name'] . 'EntityForm')) {
             $form = $this->{$customMethodName}($entity, $entityProperties, $view);
             if (!$form instanceof FormInterface) {
                 throw new \UnexpectedValueException(sprintf('The "%s" method must return a FormInterface, "%s" given.', $customMethodName, \is_object($form) ? \get_class($form) : \gettype($form)));
@@ -857,8 +856,7 @@ trait AdminControllerTrait
         /** @var FormBuilder $formBuilder */
         $formBuilder = $this->get('form.factory')->createNamedBuilder('delete_form')
             ->setAction($this->generateUrl('easyadmin', ['action' => 'delete', 'entity' => $entityName, 'id' => $entityId]))
-            ->setMethod('DELETE')
-        ;
+            ->setMethod('DELETE');
         $formBuilder->add('submit', SubmitType::class, ['label' => 'delete_modal.action', 'translation_domain' => 'EasyAdminBundle']);
         // needed to avoid submitting empty delete forms (see issue #1409)
         $formBuilder->add('_easyadmin_delete_flag', HiddenType::class, ['data' => '1']);
