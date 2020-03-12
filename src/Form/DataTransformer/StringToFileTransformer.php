@@ -36,8 +36,6 @@ class StringToFileTransformer implements DataTransformerInterface
             return null;
         }
 
-        $value = $this->uploadDir . mb_substr($value, mb_strlen($this->downloadPath . '/'));
-
         if (!$this->multiple) {
             return $this->doTransform($value);
         }
@@ -75,12 +73,14 @@ class StringToFileTransformer implements DataTransformerInterface
             return null;
         }
 
+        $value = $this->uploadDir . mb_substr($value, mb_strlen($this->downloadPath . '/'));
+
         if ($value instanceof File) {
             return $value;
         }
 
         if (\is_string($value)) {
-            return new File($value);
+            return file_exists($value) ? new File($value) : null;
         }
 
         throw new TransformationFailedException('Expected a string or null.');
