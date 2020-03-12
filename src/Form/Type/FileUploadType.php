@@ -183,9 +183,9 @@ class FileUploadType extends AbstractType implements DataMapperInterface
                 $value = str_replace('\\', '/', $value);
             }
 
-            // if ('/' !== mb_substr($value, -1)) {
-            //     $value .= '/';
-            // }
+            if ('/' !== mb_substr($value, -1)) {
+                $value .= '/';
+            }
             //TODO: test on windows
             if (0 !== mb_strpos($value, '/')) {
                 $value = $this->projectDir . '/' . $value;

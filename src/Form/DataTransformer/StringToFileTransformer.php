@@ -80,7 +80,12 @@ class StringToFileTransformer implements DataTransformerInterface
         }
 
         if (\is_string($value)) {
-            return file_exists($value) ? new File($value) : null;
+            if (!file_exists($value)) {
+                throw new TransformationFailedException('File does not exist.');
+                return null;
+            } else {
+                return new File($value);
+            }
         }
 
         throw new TransformationFailedException('Expected a string or null.');
