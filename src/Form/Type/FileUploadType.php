@@ -45,7 +45,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
         );
         $builder->setAttribute('state', new FileUploadState($options['allow_add']));
         $unset = [
-            'upload_dir', 'upload_new', 'upload_delete', 'upload_filename', 'upload_validate', 'download_path', 'allow_add', 'allow_delete', 'compound'
+            'upload_dir', 'upload_new', 'upload_delete', 'upload_filename', 'upload_validate', 'download_path', 'allow_add', 'allow_delete', 'compound',
         ];
         foreach ($unset as $opt) {
             unset($options[$opt]);
@@ -91,7 +91,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
     public function configureOptions(OptionsResolver $resolver): void
     {
         $uploadNew = static function (UploadedFile $file, string $uploadDir, string $fileName) {
-            $file->move(rtrim($uploadDir, '/\\') . \DIRECTORY_SEPARATOR, $fileName);
+            $file->move(rtrim($uploadDir, '/\\').\DIRECTORY_SEPARATOR, $fileName);
         };
 
         $uploadDelete = static function (File $file) {
@@ -125,17 +125,18 @@ class FileUploadType extends AbstractType implements DataMapperInterface
 
         $downloadPath = function (Options $options) {
             $composer = json_decode(file_get_contents(
-                $this->projectDir . \DIRECTORY_SEPARATOR . 'composer.json'
+                $this->projectDir.\DIRECTORY_SEPARATOR.'composer.json'
             ), true);
-            $public_path = array_key_exists('public-dir', $composer['extra'])
+            $public_path = \array_key_exists('public-dir', $composer['extra'])
                 ? $composer['extra']['public-dir']
                 : 'public';
+
             return mb_substr(
                 $options['upload_dir'],
                 mb_strlen(
                     $this->projectDir
-                        . \DIRECTORY_SEPARATOR
-                        . $public_path
+                        .\DIRECTORY_SEPARATOR
+                        .$public_path
                 )
             );
         };
@@ -153,7 +154,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
         };
 
         $resolver->setDefaults([
-            'upload_dir' => $this->projectDir . '/public/uploads/files/',
+            'upload_dir' => $this->projectDir.'/public/uploads/files/',
             'upload_new' => $uploadNew,
             'upload_delete' => $uploadDelete,
             'upload_filename' => $uploadFilename,
@@ -188,7 +189,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             // }
             //TODO: test on windows
             if (0 !== mb_strpos($value, '/')) {
-                $value = $this->projectDir . '/' . $value;
+                $value = $this->projectDir.'/'.$value;
             }
 
             if ('' !== $value && (!is_dir($value) || !is_writable($value))) {

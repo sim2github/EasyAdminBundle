@@ -83,7 +83,7 @@ trait AdminControllerTrait
             }
         }
 
-        return $this->executeDynamicMethod($action . '<EntityName>Action');
+        return $this->executeDynamicMethod($action.'<EntityName>Action');
     }
 
     /**
@@ -424,7 +424,7 @@ trait AdminControllerTrait
             $actionName = $batchForm->get('name')->getData();
             $actionIds = $batchForm->get('ids')->getData();
 
-            $batchActionResult = $this->executeDynamicMethod($actionName . '<EntityName>BatchAction', [$actionIds, $batchForm]);
+            $batchActionResult = $this->executeDynamicMethod($actionName.'<EntityName>BatchAction', [$actionIds, $batchForm]);
             if ($batchActionResult instanceof Response) {
                 return $batchActionResult;
             }
@@ -823,7 +823,7 @@ trait AdminControllerTrait
      */
     protected function createEntityForm($entity, array $entityProperties, $view)
     {
-        if (method_exists($this, $customMethodName = 'create' . $this->entity['name'] . 'EntityForm')) {
+        if (method_exists($this, $customMethodName = 'create'.$this->entity['name'].'EntityForm')) {
             $form = $this->{$customMethodName}($entity, $entityProperties, $view);
             if (!$form instanceof FormInterface) {
                 throw new \UnexpectedValueException(sprintf('The "%s" method must return a FormInterface, "%s" given.', $customMethodName, \is_object($form) ? \get_class($form) : \gettype($form)));
