@@ -36,7 +36,7 @@ class StringToFileTransformer implements DataTransformerInterface
             return null;
         }
 
-        $value = $this->uploadDir . $value;
+        $value = $this->uploadDir . mb_substr($value, mb_strlen($this->downloadPath . '/'));
 
         if (!$this->multiple) {
             return $this->doTransform($value);
@@ -100,11 +100,11 @@ class StringToFileTransformer implements DataTransformerInterface
                 $this->uploadDir . ($this->uploadFilename)($value)
             );
 
-            return basename($validPath);
+            return $this->downloadPath . '/' . basename($validPath);
         }
 
         if ($value instanceof File) {
-            return $value->getFilename();
+            return $this->downloadPath . '/' . $value->getFilename();
         }
 
         throw new TransformationFailedException('Expected an instance of File or null.');
