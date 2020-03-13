@@ -44,12 +44,17 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             )
         );
         $builder->setAttribute('state', new FileUploadState($options['allow_add']));
-        $unset = [
-            'upload_dir', 'upload_new', 'upload_delete', 'upload_filename', 'upload_validate', 'download_path', 'allow_add', 'allow_delete', 'compound',
-        ];
-        foreach ($unset as $opt) {
-            unset($options[$opt]);
-        }
+
+        unset($options['upload_dir'],
+        $options['upload_new'],
+        $options['upload_delete'],
+        $options['upload_filename'],
+        $options['upload_validate'],
+        $options['download_path'],
+        $options['allow_add'],
+        $options['allow_delete'],
+        $options['compound']);
+
         $builder->add('file', FileType::class, $options);
         $builder->add('delete', CheckboxType::class, ['required' => false]);
 
@@ -127,6 +132,7 @@ class FileUploadType extends AbstractType implements DataMapperInterface
             $composer = json_decode(file_get_contents(
                 $this->projectDir.\DIRECTORY_SEPARATOR.'composer.json'
             ), true);
+
             $public_path = \array_key_exists('public-dir', $composer['extra'])
                 ? $composer['extra']['public-dir']
                 : 'public';
