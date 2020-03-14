@@ -572,8 +572,7 @@ trait AdminControllerTrait
             $uploadNew = $config->getOption('upload_new');
 
             foreach ($state->getUploadedFiles() as $index => $file) {
-                $fileName = mb_substr($filePaths[$index], mb_strlen($uploadDir));
-                $uploadNew($file, $uploadDir, $fileName);
+                $uploadNew($file, $uploadDir, $filePaths[$index]);
             }
         }
     }
@@ -857,8 +856,7 @@ trait AdminControllerTrait
         /** @var FormBuilder $formBuilder */
         $formBuilder = $this->get('form.factory')->createNamedBuilder('delete_form')
             ->setAction($this->generateUrl('easyadmin', ['action' => 'delete', 'entity' => $entityName, 'id' => $entityId]))
-            ->setMethod('DELETE')
-        ;
+            ->setMethod('DELETE');
         $formBuilder->add('submit', SubmitType::class, ['label' => 'delete_modal.action', 'translation_domain' => 'EasyAdminBundle']);
         // needed to avoid submitting empty delete forms (see issue #1409)
         $formBuilder->add('_easyadmin_delete_flag', HiddenType::class, ['data' => '1']);

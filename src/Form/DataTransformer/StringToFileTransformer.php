@@ -13,13 +13,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class StringToFileTransformer implements DataTransformerInterface
 {
     private $uploadDir;
+    private $downloadPath;
     private $uploadFilename;
     private $uploadValidate;
     private $multiple;
 
-    public function __construct(string $uploadDir, callable $uploadFilename, callable $uploadValidate, bool $multiple)
+    public function __construct(string $uploadDir, string $downloadPath, callable $uploadFilename, callable $uploadValidate, bool $multiple)
     {
         $this->uploadDir = $uploadDir;
+        $this->downloadPath = $downloadPath;
         $this->uploadFilename = $uploadFilename;
         $this->uploadValidate = $uploadValidate;
         $this->multiple = $multiple;
@@ -30,7 +32,7 @@ class StringToFileTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value || [] === $value) {
+        if (null === $value || [] === $value || '' === $value) {
             return null;
         }
 
@@ -70,13 +72,14 @@ class StringToFileTransformer implements DataTransformerInterface
         if (null === $value) {
             return null;
         }
+        $value = $this->uploadDir.mb_substr($value, mb_strlen($this->downloadPath));
 
         if ($value instanceof File) {
             return $value;
         }
 
         if (\is_string($value)) {
-            return new File($value);
+            return file_exists($value) ? new File($value) : null;
         }
 
         throw new TransformationFailedException('Expected a string or null.');
@@ -87,19 +90,20 @@ class StringToFileTransformer implements DataTransformerInterface
         if (null === $value) {
             return null;
         }
-
         if ($value instanceof UploadedFile) {
             if (!$value->isValid()) {
                 throw new TransformationFailedException($value->getErrorMessage());
             }
 
-            $filename = $this->uploadDir.($this->uploadFilename)($value);
+            $validPath = ($this->uploadValidate)(
+                $this->uploadDir.($this->uploadFilename)($value)
+            );
 
-            return ($this->uploadValidate)($filename);
+            return $this->downloadPath.basename($validPath);
         }
 
         if ($value instanceof File) {
-            return $value->getPathname();
+            return $this->downloadPath.$value->getFilename();
         }
 
         throw new TransformationFailedException('Expected an instance of File or null.');
