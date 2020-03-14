@@ -447,6 +447,7 @@ form .invalid-feedback > .d-block + .d-block {
         margin: 1px 0 0 1px;
         padding: 0 8px;
         vertical-align: middle;
+        flex-basis: 50%;
     }
 
     .custom-file-input {
@@ -572,4 +573,13 @@ form .invalid-feedback > .d-block + .d-block {
 // EasyAdminCodeType
 .field-easyadmin_code_editor .form-widget {
     flex-basis: 65%;
+}
+
+.form-group.field-money{
+.input-group-append{
+    span.input-group-text{
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
 }
